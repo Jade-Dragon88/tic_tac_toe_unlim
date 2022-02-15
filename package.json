@@ -1,0 +1,26 @@
+{
+  "name": "my_ver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "myScript.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "eslint":"eslint",
+    "prettier":"prettier"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.17.0",
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-prettier": "^0.0.0-empty",
+    "prettier": "^2.5.1"
+  }
+}
