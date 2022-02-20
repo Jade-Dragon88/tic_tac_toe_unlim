@@ -1,0 +1,43 @@
+$cellSize: 45px;
+$fontSize: ($cellSize * 6)/7;
+
+.main {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(#f7aeb7, #ffcccc, #ffeee6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  & #game {
+    display: grid;
+    // grid-template-columns: repeat(3, 1fr);
+    & > div {
+      height: $cellSize;
+      width: $cellSize;
+      border: 1px solid;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 10px;
+      position: relative;
+      & .cellNum {
+        line-height: 0;
+        // color: red;
+        font-weight: 700;
+        position: absolute;
+        bottom: 6px;
+        right: 1px;
+      }
+      & span {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: $fontSize;
+        line-height: 0;
+      }
+    }
+  }
+}

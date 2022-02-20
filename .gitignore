@@ -12,9 +12,9 @@ logs
 .env 
 
 # Игнорирование файлов специфичных для IDE 
-.idea/ 
-.vscode/ 
+.idea/
 *.sw*
 
 # Игнорирование пользовательских файлов
 --.eslintrc.json
+--myStyle.css

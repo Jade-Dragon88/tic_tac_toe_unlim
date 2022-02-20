@@ -1,8 +1,62 @@
 .main {
   width: 100vw;
   height: 100vh;
+  background: -webkit-gradient(linear, left top, left bottom, from(#f7aeb7), color-stop(#ffcccc), to(#ffeee6));
   background: linear-gradient(#f7aeb7, #ffcccc, #ffeee6);
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
+
+.game-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.game-container #game {
+  display: -ms-grid;
+  display: grid;
+}
+
+.game-container #game > div {
+  height: 45px;
+  width: 45px;
+  border: 1px solid;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  font-size: 10px;
+  position: relative;
+}
+
+.game-container #game > div .cellNum {
+  line-height: 0;
+  font-weight: 700;
+  position: absolute;
+  bottom: 6px;
+  right: 1px;
+}
+
+.game-container #game > div span {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 38.57143px;
+  line-height: 0;
+}
+/*# sourceMappingURL=myStyle.css.map */
