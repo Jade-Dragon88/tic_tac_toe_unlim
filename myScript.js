@@ -61,6 +61,77 @@ class Game {
     this.init();
   }
 
+  changeCheckArrayCell(id, player, num) {
+    // достаем значение ячейки num из ключевого массива и сплитим
+    // в самом начале игры получается ['*','*', ...] размором this.size
+    let arrayFromNum = this.checkArray[num].split('');
+    // заменяем в сплит-массиве необходимую позицию на знак player
+    arrayFromNum.splice(Math.floor(id % this.size), 1, player);
+    // склеиваем обратно сплит-массив в ячейку num
+    // и запихиваем обратно в ключевом массиве на туже позицию
+    this.checkArray[num] = arrayFromNum.join('');
+    // console.log(`checkArray[${rowNum}] = ${this.checkArray[rowNum]}`);
+  }
+
+  // ф-ция записи хода в клучевой массив
+  makeMove(id /*номер ячейки*/, player) {
+    let rowNum = Math.floor(id / this.size); // номер строки в к-рую сходил player
+    this.changeCheckArrayCell(id, player, rowNum);
+
+    let columnNum = (id % this.size) + this.size; // номер столбца в к-рый сходил чел
+    this.changeCheckArrayCell(id, player, columnNum);
+
+    // анализируем все возможные диагонали
+    // побочные диагонали расчитываются смещением вниз или вверх относительно основных
+    // макс. смещение = this.size - (this.victoryNum - 1)
+    for (let i = 0; i < this.size - (this.victoryNum - 1); i++) {
+      if (
+        // главная диагональ\ (при i=0) и побочные диагонали\\ ВЫШЕ (при i=1 или 2)
+        id % (this.size + 1) === i &&
+        id <= this.limit - this.size * i
+      ) {
+        // позиция в ключ. массиве = 14+i (при victoryNum = 7)
+        let checkArrayPos = 2 * this.size + (id % (this.size + 1));
+        this.changeCheckArrayCell(id, player, checkArrayPos);
+      }
+      if (
+        // побочные диагонали\\ НИЖЕ основной\
+        id % (this.size + 1) === this.size + 1 - (1 + i) &&
+        id > this.size - 1 &&
+        i < this.size - this.victoryNum
+      ) {
+        // позиция в ключ. массиве = 17+i (при victoryNum = 7)
+        let checkArrayPos =
+          2 * this.size + (this.size - (this.victoryNum - 1)) + i;
+        this.changeCheckArrayCell(id, player, checkArrayPos);
+      }
+
+      if (
+        // главная диагональ/ (при i=0) и побочные диагонали// НИЖЕ
+        id % (this.size - 1) === i &&
+        id >= (this.size - 1) * (i + 1) &&
+        id < this.limit - this.size + 1 + i
+      ) {
+        // позиция в ключ. массиве = 19+i (при victoryNum = 7)
+        let checkArrayPos =
+          2 * this.size + 2 * (this.size - this.victoryNum) + 1 + i;
+        this.changeCheckArrayCell(id, player, checkArrayPos);
+      }
+      if (
+        // диагонали// ВЫШЕ основной/
+        id % (this.size - 1) === this.size - 1 - (1 + i) &&
+        id <= this.limit - 2 * (this.size + i) &&
+        i < this.size - this.victoryNum
+      ) {
+        // позиция в ключ. массиве = 22+i (при victoryNum = 7)
+        // let checkArrayPos = 2 * this.size + (this.size + 1) + i;
+        let checkArrayPos = this.victoryNum * (this.size - 3) + 2 + i;
+        this.changeCheckArrayCell(id, player, checkArrayPos);
+      }
+    }
+    console.log(this.checkArray);
+  }
+
   humanPlay() {
     // срабатывает при клике на ячейке
     return (e) => {
@@ -72,6 +143,14 @@ class Game {
         result.innerHTML = `<h3> Draw! </h3>`;
         return;
       }
+      this.makeMove(id, huPlayer);
+      // let indices = []; // массив со всеми ячейками, к-рые включают знак player
+      // let ind = board.indexOf(player);
+      // while (ind != -1) {
+      //   indices.push(ind);
+      //   ind = board.indexOf(player, ind + 1);
+      // }
+      // console.log(`indices = `, indices);
 
       if (this.checkWinner(this.board, huPlayer)) {
         // проверка на победную позицию
@@ -100,93 +179,6 @@ class Game {
   }
 
   checkWinner(board, player) {
-    // let id = board.filter((cell) => cell === player);
-    let indices = []; // массив со всеми ячейками, к-рые включают знак player
-    let ind = board.indexOf(player);
-    while (ind != -1) {
-      indices.push(ind);
-      ind = board.indexOf(player, ind + 1);
-    }
-    console.log(`indices = `, indices);
-    // алгоритм проверки на победные состояния
-    indices.forEach((el) => {
-      const id = +el; // получаем ID ячейки
-      let rowNum = Math.floor(id / this.size); // номер строки в к-рую сходил чел
-      // достаем значение этой строки из ключевого массива и сплитим
-      let row = this.checkArray[rowNum].split('');
-      // заменяем в сплит-массиве необходимую позицию на знак player
-      row.splice(Math.floor(id % this.size), 1, huPlayer);
-      // склеиваем обратно сплит-массив в строку
-      // и запихиваем обратно в ключевом массиве на туже позицию
-      this.checkArray[rowNum] = row.join('');
-      // console.log(`checkArray[${rowNum}] = ${this.checkArray[rowNum]}`);
-
-      let columnNum = (id % this.size) + this.size; // номер столбца в к-рый сходил чел
-      let column = this.checkArray[columnNum].split('');
-      column.splice(Math.floor(id / this.size), 1, huPlayer);
-      this.checkArray[columnNum] = column.join('');
-      // console.log(`checkArray[${columnNum}] = ${this.checkArray[columnNum]}`);
-
-      // анализируем все возможные диагонали
-      // побочные диагонали расчитываются смещением вниз или вверх относительно основных
-      // (макс. смещение = this.size - (this.victoryNum - 1))
-      for (let i = 0; i < this.size - (this.victoryNum - 1); i++) {
-        if (
-          // главная диагональ\ (при i=0) и побочные диагонали\\ ВЫШЕ (при i=1 или 2)
-          id % (this.size + 1) === i &&
-          id <= this.limit - this.size * i
-        ) {
-          // позиция в ключ. массиве = 14+i (при victoryNum = 7)
-          let checkArrayPos = 2 * this.size + (id % (this.size + 1));
-          let arrFromDiag = this.checkArray[checkArrayPos].split('');
-          arrFromDiag.splice(Math.floor(id / (this.size + 1)), 1, huPlayer);
-          this.checkArray[checkArrayPos] = arrFromDiag.join('');
-        }
-        if (
-          // побочные диагонали\\ НИЖЕ основной\
-          id % (this.size + 1) === this.size + 1 - (1 + i) &&
-          id > this.size - 1 &&
-          i < this.size - this.victoryNum
-        ) {
-          // позиция в ключ. массиве = 17+i (при victoryNum = 7)
-          let checkArrayPos =
-            2 * this.size + (this.size - (this.victoryNum - 1)) + i;
-          let arrFromDiag = this.checkArray[checkArrayPos].split('');
-          arrFromDiag.splice(Math.floor(id / (this.size + 1)), 1, huPlayer);
-          this.checkArray[checkArrayPos] = arrFromDiag.join('');
-        }
-
-        if (
-          // главная диагональ/ (при i=0) и побочные диагонали// НИЖЕ
-          id % (this.size - 1) === i &&
-          id >= (this.size - 1) * (i + 1) &&
-          id < this.limit - this.size + 1 + i
-        ) {
-          // позиция в ключ. массиве = 19+i (при victoryNum = 7)
-          let checkArrayPos =
-            2 * this.size + 2 * (this.size - this.victoryNum) + 1 + i;
-          let arrFromDiag = this.checkArray[checkArrayPos].split('');
-          arrFromDiag.splice(Math.floor(id / this.size), 1, huPlayer);
-          this.checkArray[checkArrayPos] = arrFromDiag.join('');
-        }
-        if (
-          // диагонали// ВЫШЕ основной/
-          id % (this.size - 1) === this.size - 1 - (1 + i) &&
-          id <= this.limit - 2 * (this.size + i) &&
-          i < this.size - this.victoryNum
-        ) {
-          // позиция в ключ. массиве = 22+i (при victoryNum = 7)
-          // let checkArrayPos = 2 * this.size + (this.size + 1) + i;
-          let checkArrayPos = this.victoryNum * (this.size - 3) + 2 + i;
-          let arrFromDiag = this.checkArray[checkArrayPos].split('');
-          arrFromDiag.splice(Math.floor(id / this.size), 1, huPlayer);
-          this.checkArray[checkArrayPos] = arrFromDiag.join('');
-        }
-      }
-      // console.log(this.checkArray);
-    });
-
-    console.log(this.checkArray);
     const checkAvailability = (arr, val) => {
       return arr.some((arrVal) => {
         return arrVal.includes(val);
