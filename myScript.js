@@ -149,13 +149,6 @@ class Game {
         return;
       }
       this.makeMove(id, huPlayer); // запись хода в ключевой массив
-      // let indices = []; // массив со всеми ячейками, к-рые включают знак player
-      // let ind = board.indexOf(player);
-      // while (ind != -1) {
-      //   indices.push(ind);
-      //   ind = board.indexOf(player, ind + 1);
-      // }
-      // console.log(`indices = `, indices);
 
       if (this.checkWinner(/* this.board, */ huPlayer)) {
         // проверка на победную позицию
