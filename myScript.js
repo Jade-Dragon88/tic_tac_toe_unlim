@@ -62,18 +62,20 @@ class Game {
   }
 
   // изменение ячейки ключевого массива
-  changeCheckArrayCell(id, player, num) {
+  changeCheckArrayCell(id, player, num, isColumn = false) {
     // достаем значение ячейки num из ключевого массива и сплитим
     // в самом начале игры получается ['*','*', ...] размором this.size
     let arrayFromNum = this.checkArray[num].split('');
     // заменяем в сплит-массиве необходимую позицию на знак player
-    arrayFromNum.splice(Math.floor(id / this.size), 1, player);
-    // console.log('Позиция', Math.floor(id / this.size));
+    let splicePos; // позиция символа в ячейке ключ. массива
+    isColumn ? (splicePos = id / this.size) : (splicePos = id % this.size);
+    arrayFromNum.splice(Math.floor(splicePos), 1, player);
     // склеиваем обратно сплит-массив в ячейку num
     // и запихиваем обратно в ключевом массиве на туже позицию
     this.checkArray[num] = arrayFromNum.join('');
     // console.log(`checkArray[${rowNum}] = ${this.checkArray[rowNum]}`);
   }
+
   // запись хода в ключевой массив
   makeMove(id, player) {
     let rowNum = Math.floor(id / this.size); // номер строки в к-рую сходил player
@@ -82,7 +84,7 @@ class Game {
 
     let columnNum = (id % this.size) + this.size; // номер столбца в к-рый сходил чел
     // console.log('Столбец', columnNum);
-    this.changeCheckArrayCell(id, player, columnNum);
+    this.changeCheckArrayCell(id, player, columnNum, 'isColumn');
 
     // анализируем все возможные диагонали
     // побочные диагонали расчитываются смещением вниз или вверх относительно основных
@@ -184,10 +186,19 @@ class Game {
           ind = cell.indexOf(player, ind + 1);
           count++;
         }
-        count >= this.victoryNum - 2 ? indices.push(index) : null; // отсекаем ячейки где знаков player < 3
+        count >= this.victoryNum - 2 ? indices.push(index) : null; // удали ключ. ячейки где знаков player < 3
       }
     });
     console.log('indices = ', indices);
+
+    if (indices.length) {
+      console.log('!!!');
+      // const bestMove = this.minimax(indices, aiPlayer);
+      // arr - массив indices с номерами ячеек ключ.массива, в к-рых знаков player >= 3
+      indices.forEach((el, index) => {
+        this.myMiniMax(this.checkArray[el], aiPlayer);
+      });
+    }
   }
 
   // проверка ключевого массива на победное состояние
@@ -205,9 +216,16 @@ class Game {
     }
   }
 
-  findEmptyPosition(cell) {
-    // выделяес из всей доски пустые клетки
-    return board.filter((cell) => cell !== huPlayer && cell !== aiPlayer);
+  findEmptyPosition(value) {
+    let AAA = value.split('');
+    let BBB = [];
+    let ind = AAA.indexOf('*');
+    while (ind != -1) {
+      BBB.push(ind);
+      ind = AAA.indexOf('*', ind + 1);
+    }
+    // console.log('BBB = ', BBB);
+    return BBB;
   }
   // выделяет из всей доски клетки чела
   findHuCells(board) {
@@ -225,19 +243,33 @@ class Game {
     });
     return aiCells;
   }
-  // функция анализа и предсказания ходов и победных позиций
-  // myMiniMax(cell, player) {
-  //   const emptyPosition =
-  // }
 
-  /*   minimax(board, player) {
-    const emptyCells = this.findEmptyCells(board); // массив пустых клеток
+  // функция анализа и предсказания ходов и победных позиций
+  myMiniMax(el, player) {
+    // el - значение ключ. ячейки
+    // console.log(el);
+    let emptyPosition = this.findEmptyPosition(el); // находим пустые позиции (те, что = *) в ключ. фразе
+    console.log('emptyPosition = ', emptyPosition);
+    let AAA = el.split('');
+    AAA.splice(emptyPosition[0], 1, player);
+    el = AAA.join('');
+    console.log(el);
+    emptyPosition = this.findEmptyPosition(el);
+    if (emptyPosition.length) {
+      player === aiPlayer
+        ? this.myMiniMax(el, huPlayer)
+        : this.myMiniMax(el, aiPlayer);
+    }
+  }
+
+  /* minimax(arr, player) {
+    const emptyCells = this.findEmptyCells(arr); // массив пустых клеток
     // console.log('emptyCells =', emptyCells);
-    if (this.checkWinner(board, huPlayer)) {
+    if (this.checkWinner(arr, huPlayer)) {
       // если победное состояние у человека, то возвращаем -10
       return { score: -10 };
     }
-    if (this.checkWinner(board, aiPlayer)) {
+    if (this.checkWinner(arr, aiPlayer)) {
       // если победное состояние у компа, то возвращаем 10
       return { score: 10 };
     }
@@ -250,17 +282,17 @@ class Game {
     let moves = []; // массив для всех возможных ходов
     for (let i = 0; i < emptyCells.length; i++) {
       let move = {}; // параметры конкретного хода (индекс ячейки + score)
-      board[emptyCells[i]] = player; // делаем ход за конкретного игрока(чел или комп)
+      arr[emptyCells[i]] = player; // делаем ход за конкретного игрока(чел или комп)
       move.index = emptyCells[i]; // порядковый номер ячейки для послед. хода
       if (player === huPlayer) {
-        const payload = this.minimax(board, aiPlayer);
+        const payload = this.minimax(arr, aiPlayer);
         move.score = payload.score;
       }
       if (player === aiPlayer) {
-        const payload = this.minimax(board, huPlayer);
+        const payload = this.minimax(arr, huPlayer);
         move.score = payload.score;
       }
-      board[emptyCells[i]] = move.index;
+      arr[emptyCells[i]] = move.index;
       moves.push(move);
     }
 
