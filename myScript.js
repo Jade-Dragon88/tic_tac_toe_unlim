@@ -189,7 +189,7 @@ class Game {
         count >= this.victoryNum - 2 ? indices.push(index) : null; // удали ключ. ячейки где знаков player < 3
       }
     });
-    console.log('indices = ', indices);
+    indices.length ? console.log('indices = ', indices) : null;
 
     if (indices.length) {
       console.log('!!!');
@@ -247,19 +247,53 @@ class Game {
   // функция анализа и предсказания ходов и победных позиций
   myMiniMax(el, player) {
     // el - значение ключ. ячейки
-    // console.log(el);
+    let changedEl;
     let emptyPosition = this.findEmptyPosition(el); // находим пустые позиции (те, что = *) в ключ. фразе
-    console.log('emptyPosition = ', emptyPosition);
-    let AAA = el.split('');
-    AAA.splice(emptyPosition[0], 1, player);
-    el = AAA.join('');
-    console.log(el);
-    emptyPosition = this.findEmptyPosition(el);
+    // this.checkWinner(el, huPlayer) ? { score: -10 } : null;
+    // this.checkWinner(el, aiPlayer) ? { score: 10 } : null;
+    // emptyPosition.length === 0 ? { score: 0 } : null;
+    if (this.checkWinner(el.split(''), huPlayer)) {
+      // если победное состояние у человека, то возвращаем -10
+      return { score: -10 };
+    }
+    if (this.checkWinner(el.split(''), aiPlayer)) {
+      // если победное состояние у компа, то возвращаем 10
+      return { score: 10 };
+    }
+    if (emptyPosition.length === 0) {
+      // если пустых ячеек нет, то возвращаем 0
+      return { score: 0 };
+    }
+    // console.log('emptyPosition = ', emptyPosition);
+    let moves = []; // массив для всех возможных ходов
+    for (let i = 0; i < emptyPosition.length; i++) {
+      let move = {};
+      move.index = emptyPosition[i];
+      let splitEL = el.split('');
+      splitEL.splice(emptyPosition[i], 1, player);
+      changedEl = splitEL.join('');
+      // console.log(changedEl);
+
+      if (player === huPlayer) {
+        const payload = this.myMiniMax(changedEl, aiPlayer);
+        move.score = payload.score;
+      }
+      if (player === aiPlayer) {
+        const payload = this.myMiniMax(changedEl, huPlayer);
+        move.score = payload.score;
+      }
+      moves.push(move);
+    }
+    console.log('moves = ', moves);
+
+    /* emptyPosition = this.findEmptyPosition(el);
     if (emptyPosition.length) {
       player === aiPlayer
         ? this.myMiniMax(el, huPlayer)
         : this.myMiniMax(el, aiPlayer);
-    }
+    } */
+
+    let bestMove;
   }
 
   /* minimax(arr, player) {
@@ -283,7 +317,7 @@ class Game {
     for (let i = 0; i < emptyCells.length; i++) {
       let move = {}; // параметры конкретного хода (индекс ячейки + score)
       arr[emptyCells[i]] = player; // делаем ход за конкретного игрока(чел или комп)
-      move.index = emptyCells[i]; // порядковый номер ячейки для послед. хода
+      move.index = emptyCells[i]; // порядковый номер ячейки для последнего хода
       if (player === huPlayer) {
         const payload = this.minimax(arr, aiPlayer);
         move.score = payload.score;
@@ -326,4 +360,4 @@ class Game {
   } */
 }
 
-new Game(19); // запускаем игру
+new Game(5); // запускаем игру
