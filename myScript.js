@@ -65,7 +65,8 @@ class Game {
   changeCheckArrayCell(id, player, num, isColumn = false) {
     // достаем значение ячейки num из ключевого массива и сплитим
     // в самом начале игры получается ['*','*', ...] размором this.size
-    let arrayFromNum = this.checkArray[num].split('');
+    // let arrayFromNum = this.checkArray[num].split('');
+    let arrayFromNum = [...this.checkArray[num]];
     // заменяем в сплит-массиве необходимую позицию на знак player
     let splicePos; // позиция символа в ячейке ключ. массива
     isColumn ? (splicePos = id / this.size) : (splicePos = id % this.size);
@@ -152,7 +153,7 @@ class Game {
       }
       this.makeMove(id, huPlayer); // запись хода в ключевой массив
 
-      if (this.checkWinner(/* this.board, */ huPlayer)) {
+      if (this.checkWinner(this.checkArray, huPlayer, this.victoryNum)) {
         // проверка на победную позицию
         result.innerHTML = `<h3>You win!</h3>`;
         return;
@@ -192,24 +193,25 @@ class Game {
     indices.length ? console.log('indices = ', indices) : null;
 
     if (indices.length) {
-      console.log('!!!');
+      // console.log('!!!');
       // const bestMove = this.minimax(indices, aiPlayer);
       // arr - массив indices с номерами ячеек ключ.массива, в к-рых знаков player >= 3
       indices.forEach((el, index) => {
+        console.log(`checkArray[${el}] = ${this.checkArray[el]}`);
         this.myMiniMax(this.checkArray[el], aiPlayer);
       });
     }
   }
 
   // проверка ключевого массива на победное состояние
-  checkWinner(/* board, */ player) {
+  checkWinner(innerArr, player, num) {
     const checkWin = (arr, value) => {
       return arr.some((arrVal) => {
         return arrVal.includes(value);
       });
     };
 
-    if (checkWin(this.checkArray, player.repeat(this.victoryNum))) {
+    if (checkWin(innerArr, player.repeat(num))) {
       return true;
     } else {
       return false;
@@ -217,7 +219,8 @@ class Game {
   }
 
   findEmptyPosition(value) {
-    let AAA = value.split('');
+    // let AAA = value.split('');
+    let AAA = [...value];
     let BBB = [];
     let ind = AAA.indexOf('*');
     while (ind != -1) {
@@ -252,11 +255,12 @@ class Game {
     // this.checkWinner(el, huPlayer) ? { score: -10 } : null;
     // this.checkWinner(el, aiPlayer) ? { score: 10 } : null;
     // emptyPosition.length === 0 ? { score: 0 } : null;
-    if (this.checkWinner(el.split(''), huPlayer)) {
+
+    if (this.checkWinner([[...el].join('')], huPlayer, this.victoryNum - 1)) {
       // если победное состояние у человека, то возвращаем -10
       return { score: -10 };
     }
-    if (this.checkWinner(el.split(''), aiPlayer)) {
+    if (this.checkWinner([[...el].join('')], aiPlayer, this.victoryNum - 1)) {
       // если победное состояние у компа, то возвращаем 10
       return { score: 10 };
     }
@@ -264,25 +268,38 @@ class Game {
       // если пустых ячеек нет, то возвращаем 0
       return { score: 0 };
     }
+
     // console.log('emptyPosition = ', emptyPosition);
     let moves = []; // массив для всех возможных ходов
     for (let i = 0; i < emptyPosition.length; i++) {
       let move = {};
       move.index = emptyPosition[i];
-      let splitEL = el.split('');
+      // let splitEL = el.split('');
+      let splitEL = [...el];
       splitEL.splice(emptyPosition[i], 1, player);
       changedEl = splitEL.join('');
-      // console.log(changedEl);
-
+      console.log(`player ${player} moves to ${move.index}`);
+      // console.log('move = ', move);
+      console.log(changedEl);
       if (player === huPlayer) {
         const payload = this.myMiniMax(changedEl, aiPlayer);
-        move.score = payload.score;
+        console.log('payload = ', payload);
+        payload ? (move.score = payload.score) : null;
+        // return;
       }
       if (player === aiPlayer) {
         const payload = this.myMiniMax(changedEl, huPlayer);
-        move.score = payload.score;
+        console.log('payload = ', payload);
+        payload ? (move.score = payload.score) : null;
+        // return;
       }
+      console.log('move = ', move);
+      // player === aiPlayer
+      //   ? this.myMiniMax(changedEl, huPlayer)
+      //   : this.myMiniMax(changedEl, aiPlayer);
+      //???????????????????????????????????????????????????????????????
       moves.push(move);
+      console.log('moves = ', moves);
     }
     console.log('moves = ', moves);
 
@@ -359,5 +376,5 @@ class Game {
     return moves[bestMove]; // возвращаем из цикла св-ва лучшего хода
   } */
 }
-
-new Game(5); // запускаем игру
+// let log =(a)=>{console.log(`${a} = `)}
+new Game(7); // запускаем игру
