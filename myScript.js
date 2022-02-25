@@ -179,6 +179,7 @@ class Game {
     // console.log(this.checkArray);
 
     let indices = []; // номера ячеек ключ. массива, к-рые имеют 3 знака player или более
+    // заполняем массив indices
     this.checkArray.forEach((cell, index) => {
       if (cell.includes(player)) {
         let count = 0;
@@ -191,15 +192,36 @@ class Game {
       }
     });
     indices.length ? console.log('indices = ', indices) : null;
-
+    let bestMoves = []; // массив лучших ходов при анализе всех ячеек indices
     if (indices.length) {
-      // console.log('!!!');
-      // const bestMove = this.minimax(indices, aiPlayer);
-      // arr - массив indices с номерами ячеек ключ.массива, в к-рых знаков player >= 3
       indices.forEach((el, index) => {
         console.log(`checkArray[${el}] = ${this.checkArray[el]}`);
-        this.myMiniMax(this.checkArray[el], aiPlayer);
+        const bestMove = this.myMiniMax(this.checkArray[el], aiPlayer);
+        // console.log(bestMove);
+        // bestMoves.push(bestMove);
+        bestMoves.push({
+          line: el, // линия для хода
+          cell: bestMove.index, // ячейка для хода
+        });
       });
+      console.log('bestMoves = ', bestMoves);
+
+      // среди лучших ходов находим ячейки с 3 знаками подряд
+      // Они - первые в приоритете для хода
+      let BBB = [];
+      bestMoves.length > 1
+        ? this.checkArray.forEach(function (el, i) {
+            el.includes('OOO') ? BBB.push(i) : null;
+          })
+        : BBB.push(bestMoves[0].line);
+      console.log('BBB = ', BBB);
+
+      // среди лучших ходов находим те, что указывают не на 0 позицию в ячейке.
+      // они вторые в приоритете для хода.
+      let AAA = bestMoves.filter(function (el) {
+        return el.cell > 0;
+      });
+      console.log('AAA = ', AAA);
     }
   }
 
@@ -256,11 +278,11 @@ class Game {
     // this.checkWinner(el, aiPlayer) ? { score: 10 } : null;
     // emptyPosition.length === 0 ? { score: 0 } : null;
 
-    if (this.checkWinner([[...el].join('')], huPlayer, this.victoryNum - 1)) {
+    if (this.checkWinner([[...el].join('')], huPlayer, this.victoryNum)) {
       // если победное состояние у человека, то возвращаем -10
       return { score: -10 };
     }
-    if (this.checkWinner([[...el].join('')], aiPlayer, this.victoryNum - 1)) {
+    if (this.checkWinner([[...el].join('')], aiPlayer, this.victoryNum)) {
       // если победное состояние у компа, то возвращаем 10
       return { score: 10 };
     }
@@ -278,30 +300,30 @@ class Game {
       let splitEL = [...el];
       splitEL.splice(emptyPosition[i], 1, player);
       changedEl = splitEL.join('');
-      console.log(`player ${player} moves to ${move.index}`);
+      // console.log(`player ${player} moves to ${move.index}`);
       // console.log('move = ', move);
-      console.log(changedEl);
+      // console.log(changedEl);
       if (player === huPlayer) {
         const payload = this.myMiniMax(changedEl, aiPlayer);
-        console.log('payload = ', payload);
+        // console.log('payload = ', payload);
         payload ? (move.score = payload.score) : null;
         // return;
       }
       if (player === aiPlayer) {
         const payload = this.myMiniMax(changedEl, huPlayer);
-        console.log('payload = ', payload);
+        // console.log('payload = ', payload);
         payload ? (move.score = payload.score) : null;
         // return;
       }
-      console.log('move = ', move);
+      // console.log('move = ', move);
       // player === aiPlayer
       //   ? this.myMiniMax(changedEl, huPlayer)
       //   : this.myMiniMax(changedEl, aiPlayer);
       //???????????????????????????????????????????????????????????????
       moves.push(move);
-      console.log('moves = ', moves);
+      // console.log('moves = ', moves);
     }
-    console.log('moves = ', moves);
+    // console.log('moves = ', moves);
 
     /* emptyPosition = this.findEmptyPosition(el);
     if (emptyPosition.length) {
@@ -311,6 +333,35 @@ class Game {
     } */
 
     let bestMove;
+    // на данный момент кода массив moves полностью заполнен всеми возможными ходами
+    // выбор наилучшего хода, если очередь хода за компом
+    if (player === aiPlayer) {
+      let bestScore = -Infinity;
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].score > bestScore) {
+          // среди всех возможных ходов находим тот, что имеет значение 10
+          // если их несколько, выбирается первый
+          bestScore = moves[i].score;
+          bestMove = i;
+          // console.log(`bestScore = ${bestScore}; bestMove = ${bestMove}`);
+        }
+      }
+    }
+    // выбор наилучшего хода, если очередь хода за челом
+    if (player === huPlayer) {
+      let bestScore = Infinity;
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].score < bestScore) {
+          // среди всех возможных ходов находим тот, что имеет значение -10
+          // если их несколько, выбирается первый
+          bestScore = moves[i].score;
+          bestMove = i;
+          // console.log(`bestScore = ${bestScore}; bestMove = ${bestMove}`);
+        }
+      }
+    }
+    // console.log(`bestMove = ${bestMove}`);
+    return moves[bestMove]; // возвращаем из цикла св-ва лучшего хода
   }
 
   /* minimax(arr, player) {
@@ -377,4 +428,5 @@ class Game {
   } */
 }
 // let log =(a)=>{console.log(`${a} = `)}
-new Game(7); // запускаем игру
+
+new Game(11); // запускаем игру
