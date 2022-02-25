@@ -206,20 +206,21 @@ class Game {
       });
       console.log('bestMoves = ', bestMoves);
 
-      // среди лучших ходов находим ячейки с 3 знаками подряд
+      // среди лучших ходов (bestMoves) находим ячейки с 3 знаками подряд
       // Они - первые в приоритете для хода
-      let BBB = [];
+      let AAA = [];
+      let lineForFirstMove = [];
       bestMoves.length > 1
         ? this.checkArray.forEach(function (el, i) {
-            el.includes('OOO') ? BBB.push(i) : null;
+            el.includes('OOO') ? lineForFirstMove.push(i) : null;
           })
-        : BBB.push(bestMoves[0].line);
-      console.log('BBB = ', BBB);
+        : lineForFirstMove.push(bestMoves[0].line);
+      console.log('lineForFirstMove = ', lineForFirstMove);
 
-      // среди лучших ходов находим те, что указывают не на 0 позицию в ячейке.
+      // среди лучших ходов (bestMoves) находим те, что указывают не на 0 позицию в ячейке.
       // они вторые в приоритете для хода.
-      let AAA = bestMoves.filter(function (el) {
-        return el.cell > 0;
+      bestMoves.forEach(function (el) {
+        el.cell > 0 ? AAA.push(el.line) : null;
       });
       console.log('AAA = ', AAA);
     }
