@@ -192,7 +192,10 @@ class Game {
       }
     });
     indices.length ? console.log('indices = ', indices) : null;
+
     let bestMoves = []; // массив лучших ходов при анализе всех ячеек indices
+    let lineForPrymaryMove = []; // приоритетные линии для хода (будет массив с объектом)
+    let lineForSecondaryMove = []; // линии с вторичным приоритетом для хода (будет массив с объектами)
     if (indices.length) {
       indices.forEach((el, index) => {
         console.log(`checkArray[${el}] = ${this.checkArray[el]}`);
@@ -208,21 +211,32 @@ class Game {
 
       // среди лучших ходов (bestMoves) находим ячейки с 3 знаками подряд
       // Они - первые в приоритете для хода
-      let AAA = [];
-      let lineForFirstMove = [];
-      bestMoves.length > 1
-        ? this.checkArray.forEach(function (el, i) {
-            el.includes('OOO') ? lineForFirstMove.push(i) : null;
-          })
-        : lineForFirstMove.push(bestMoves[0].line);
-      console.log('lineForFirstMove = ', lineForFirstMove);
+      if (bestMoves.length > 1) {
+        bestMoves.forEach((el) => {
+          this.checkArray[el.line].includes('OOO')
+            ? lineForPrymaryMove.push(el)
+            : null;
+        });
+      }
+      console.log('lineForPrymaryMove = ', lineForPrymaryMove);
 
       // среди лучших ходов (bestMoves) находим те, что указывают не на 0 позицию в ячейке.
       // они вторые в приоритете для хода.
-      bestMoves.forEach(function (el) {
-        el.cell > 0 ? AAA.push(el.line) : null;
-      });
-      console.log('AAA = ', AAA);
+      if (!lineForPrymaryMove.length) {
+        bestMoves.forEach(function (el) {
+          el.cell > 0 ? lineForSecondaryMove.push(el) : null;
+        });
+      }
+      console.log('lineForSecondaryMove = ', lineForSecondaryMove);
+    }
+    if (lineForPrymaryMove.length) {
+      let arrayFromLine = [...this.checkArray[lineForPrymaryMove[0].line]];
+      // console.log('arrayFromLine = ', arrayFromLine);
+      arrayFromLine.splice([lineForPrymaryMove[0].cell], 1, aiPlayer);
+      this.checkArray[lineForPrymaryMove[0].line] = arrayFromLine.join('');
+      // console.log('Ячейка = ', this.checkArray[lineForPrymaryMove[0].line]);
+      console.log(this.board);
+    } else {
     }
   }
 
