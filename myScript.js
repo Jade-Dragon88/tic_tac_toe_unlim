@@ -234,7 +234,7 @@ class Game {
       // console.log('arrayFromLine = ', arrayFromLine);
       arrayFromLine.splice([lineForPrymaryMove[0].cell], 1, aiPlayer);
       this.checkArray[lineForPrymaryMove[0].line] = arrayFromLine.join('');
-      // console.log('Ячейка = ', this.checkArray[lineForPrymaryMove[0].line]);
+      console.log('Ячейка = ', this.checkArray[lineForPrymaryMove[0].line]);
       console.log(this.board);
     } else {
     }
@@ -286,7 +286,7 @@ class Game {
 
   // функция анализа и предсказания ходов и победных позиций
   myMiniMax(el, player) {
-    // el - значение ключ. ячейки
+    // el - ключ.фраза
     let changedEl;
     let emptyPosition = this.findEmptyPosition(el); // находим пустые позиции (те, что = *) в ключ. фразе
     // this.checkWinner(el, huPlayer) ? { score: -10 } : null;
