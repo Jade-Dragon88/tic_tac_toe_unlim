@@ -43,7 +43,8 @@ class Game {
       this.cellList.push(cell);
     }
     for (let i = 0; i < this.checkArray.length; i++) {
-      this.checkArray[i] = '*'.repeat(this.size);
+      // this.checkArray[i] = '*'.repeat(this.size);
+      this.checkArray[i] = ['*'.repeat(this.size), []];
     }
     // console.log(this.checkArray);
     // если в начале игры turn === 1, то первым ходит комп
@@ -63,17 +64,19 @@ class Game {
 
   // изменение ячейки ключевого массива
   changeCheckArrayCell(id, player, num, isColumn = false) {
+    this.checkArray[num][1].push(id);
     // достаем значение ячейки num из ключевого массива и сплитим
-    // в самом начале игры получается ['*','*', ...] размором this.size
+    // в самом начале игры получается ['*','*', ...] размером this.size
     // let arrayFromNum = this.checkArray[num].split('');
-    let arrayFromNum = [...this.checkArray[num]];
+    // let arrayFromNum = [...this.checkArray[num]];
+    let arrayFromNum = [...this.checkArray[num][0]];
     // заменяем в сплит-массиве необходимую позицию на знак player
     let splicePos; // позиция символа в ячейке ключ. массива
     isColumn ? (splicePos = id / this.size) : (splicePos = id % this.size);
     arrayFromNum.splice(Math.floor(splicePos), 1, player);
     // склеиваем обратно сплит-массив в ячейку num
     // и запихиваем обратно в ключевом массиве на туже позицию
-    this.checkArray[num] = arrayFromNum.join('');
+    this.checkArray[num][0] = arrayFromNum.join('');
     // console.log(`checkArray[${rowNum}] = ${this.checkArray[rowNum]}`);
   }
 
@@ -83,7 +86,7 @@ class Game {
     // console.log('Строка', rowNum);
     this.changeCheckArrayCell(id, player, rowNum);
 
-    let columnNum = (id % this.size) + this.size; // номер столбца в к-рый сходил чел
+    let columnNum = (id % this.size) + this.size; // номер столбца в к-рый сходил player
     // console.log('Столбец', columnNum);
     this.changeCheckArrayCell(id, player, columnNum, 'isColumn');
 
@@ -138,13 +141,14 @@ class Game {
         this.changeCheckArrayCell(id, player, checkArrayPos);
       }
     }
-    // console.log(this.checkArray);
+    console.log(this.checkArray);
   }
   // ход человека (срабатывает при клике на ячейке поля)
   humanPlay() {
     return (e) => {
       this.turnCount += 1;
-      const id = +e.target.getAttribute('data-id'); // получаем ID ячейки
+      const id = +e.target.getAttribute('data-id'); // получаем ID ячейки поля
+      // console.log('id = ', id);
       this.board[id] = huPlayer; // записываем в позицию массива board символ игрока
       this.cellList[id].innerHTML = `<span>${huPlayer}</span>`; // добавляем в DOM символ игрока
       if (this.turnCount >= this.limit) {
@@ -444,4 +448,4 @@ class Game {
 }
 // let log =(a)=>{console.log(`${a} = `)}
 
-new Game(11); // запускаем игру
+new Game(11); // запускаем игру с полем 11 на 11
