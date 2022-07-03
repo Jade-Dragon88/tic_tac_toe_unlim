@@ -54,7 +54,9 @@ class Game {
   }
 
   resetGame() {
-    this.board = [...Array(this.limit).keys()];
+    // this.board = [...Array(this.limit).keys()];
+    this.board = Array(this.limit).fill('*');
+    // console.log(this.board);
     this.cellList = [];
     result.innerHTML = '';
     game.innerHTML = '';
@@ -149,7 +151,8 @@ class Game {
       this.turnCount += 1;
       const id = +e.target.getAttribute('data-id'); // получаем ID ячейки поля
       // console.log('id = ', id);
-      this.board[id] = huPlayer; // записываем в позицию массива board символ игрока
+      this.board[id] = huPlayer; // записываем в массив board символ игрока
+      console.log('board = ' + this.board);
       this.cellList[id].innerHTML = `<span>${huPlayer}</span>`; // добавляем в DOM символ игрока
       if (this.turnCount >= this.limit) {
         result.innerHTML = `<h3> Draw! </h3>`;
@@ -162,14 +165,15 @@ class Game {
         result.innerHTML = `<h3>You win!</h3>`;
         return;
       }
-      this.makeAiTurn(huPlayer);
+      // this.makeAiTurn(huPlayer);
     };
   }
 
   makeAiTurn(player) {
-    // this.turnCount += 1;
+    this.turnCount += 1;
     // const bestMove = this.minimax(this.board, aiPlayer);
-    // console.log(bestMove);
+    const bestMove = this.myMiniMax(this.board, aiPlayer);
+    console.log(bestMove);
     // this.board[bestMove.index] = aiPlayer;
     // this.cellList[bestMove.index].innerHTML = `<span>${aiPlayer}</span>`;
     // if (this.turnCount >= this.limit) {
@@ -262,8 +266,9 @@ class Game {
   findEmptyPosition(value) {
     // let AAA = value.split('');
     let AAA = [...value];
+    // console.log('AAA = ' + AAA);
     let BBB = [];
-    let ind = AAA.indexOf('*');
+    let ind = AAA.indexOf('O');
     while (ind != -1) {
       BBB.push(ind);
       ind = AAA.indexOf('*', ind + 1);
@@ -307,6 +312,7 @@ class Game {
     }
     if (emptyPosition.length === 0) {
       // если пустых ячеек нет, то возвращаем 0
+      console.log('!!! 313 !!!');
       return { score: 0 };
     }
 
